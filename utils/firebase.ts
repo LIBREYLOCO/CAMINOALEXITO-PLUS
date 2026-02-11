@@ -5,13 +5,13 @@ import { GameState } from "../types";
 
 // TODO: El usuario debe reemplazar esto con su propia configuración de Firebase Console
 const firebaseConfig = {
-    apiKey: "AIzaSyDvaxFYYPnU5KjgaQhuE355kHRZbqnWNNA",
-    authDomain: "camino-al-exito-plus.firebaseapp.com",
-    databaseURL: "https://camino-al-exito-plus-default-rtdb.firebaseio.com",
-    projectId: "camino-al-exito-plus",
-    storageBucket: "camino-al-exito-plus.firebasestorage.app",
-    messagingSenderId: "4325012185",
-    appId: "1:4325012185:web:9b386fbfa00f22d26504c8",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
     measurementId: "G-E63LCL3VSF"
 };
 
