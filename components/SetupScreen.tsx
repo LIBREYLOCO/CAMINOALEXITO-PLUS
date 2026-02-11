@@ -146,13 +146,17 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ playerIndex, totalPlayers, on
         setHappy(0);
         setNameError(null);
         setAnimatingIcon(null);
+    }, [playerIndex]);
 
+    useEffect(() => {
         // Find the next available color and icon
+        // We only want to do this when starting setup for a new player
         const availableColor = pColors.find(c => !usedColors.includes(c));
         setColor(availableColor || pColors[playerIndex % pColors.length]);
         const availableIcon = pIcons.find(i => !usedIcons.includes(i));
         setIcon(availableIcon || pIcons[playerIndex % pIcons.length]);
-    }, [playerIndex, usedColors, usedIcons]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [playerIndex]);
 
     // Handle icon selection with animation
     const handleIconSelect = (index: number) => {
