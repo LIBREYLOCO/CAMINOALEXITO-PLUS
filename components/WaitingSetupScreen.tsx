@@ -10,7 +10,7 @@ const WaitingSetupScreen: React.FC<WaitingSetupScreenProps> = ({ currentSetupInd
     return (
         <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-6">
             {roomId && (
-                <div className="absolute top-6 right-6">
+                <div className="fixed top-6 right-6 z-[100]">
                     <div className="bg-cyan-500/20 border border-cyan-500 text-cyan-400 font-black py-2 px-6 rounded-xl text-xl uppercase tracking-widest shadow-[0_0_15px_rgba(6,182,212,0.3)] animate-pulse">
                         SALA: {roomId}
                     </div>
