@@ -6,9 +6,10 @@ import { playSound } from '../../utils/soundManager';
 interface DiceEventModalProps {
     tile: Tile;
     onResolve: (rewards: Rewards) => void;
+    canInteract?: boolean;
 }
 
-const DiceEventModal: React.FC<DiceEventModalProps> = ({ tile, onResolve }) => {
+const DiceEventModal: React.FC<DiceEventModalProps> = ({ tile, onResolve, canInteract = true }) => {
     const [dieValue, setDieValue] = useState<number | string>("🎲");
     const [resultText, setResultText] = useState("");
     const [rewards, setRewards] = useState<Rewards>({});
@@ -16,7 +17,7 @@ const DiceEventModal: React.FC<DiceEventModalProps> = ({ tile, onResolve }) => {
     const [isRolling, setIsRolling] = useState(false);
 
     const rollEventDie = () => {
-        if (isRolling) return;
+        if (isRolling || !canInteract) return;
         playSound('diceRoll', 0.7);
         setIsRolling(true);
         setResultText("");
@@ -59,6 +60,7 @@ const DiceEventModal: React.FC<DiceEventModalProps> = ({ tile, onResolve }) => {
     };
 
     const handleResolve = () => {
+        if (!canInteract) return;
         playSound('uiClick', 0.3);
         onResolve(rewards);
     };
@@ -145,14 +147,14 @@ const DiceEventModal: React.FC<DiceEventModalProps> = ({ tile, onResolve }) => {
                     </div>
 
                     {!isRolled ? (
-                        <button onClick={rollEventDie} disabled={isRolling}
-                            className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase shadow-[0_10px_20px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100 border-b-4 border-slate-300">
-                            {isRolling ? 'Lanzando...' : '🎲 Lanzar Dado'}
+                        <button onClick={rollEventDie} disabled={isRolling || !canInteract}
+                            className={`w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase shadow-[0_10px_20px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100 border-b-4 border-slate-300 ${!canInteract ? 'cursor-not-allowed' : ''}`}>
+                            {isRolling ? 'Lanzando...' : (canInteract ? '🎲 Lanzar Dado' : 'Esperando...')}
                         </button>
                     ) : (
-                        <button onClick={handleResolve}
-                            className="w-full py-4 bg-yellow-400 text-yellow-900 rounded-2xl font-black text-sm uppercase shadow-[0_10px_20px_rgba(250,204,21,0.3)] hover:scale-105 transition-transform active:scale-95 border-b-4 border-yellow-600 animate__animated animate__pulse animate__infinite">
-                            Continuar
+                        <button onClick={handleResolve} disabled={!canInteract}
+                            className={`w-full py-4 bg-yellow-400 text-yellow-900 rounded-2xl font-black text-sm uppercase shadow-[0_10px_20px_rgba(250,204,21,0.3)] hover:scale-105 transition-transform active:scale-95 border-b-4 border-yellow-600 animate__animated animate__pulse animate__infinite ${!canInteract ? 'opacity-50 cursor-not-allowed animate-none' : ''}`}>
+                            {canInteract ? 'Continuar' : 'Esperando...'}
                         </button>
                     )}
                 </div>

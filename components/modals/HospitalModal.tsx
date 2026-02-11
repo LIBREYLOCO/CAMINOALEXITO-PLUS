@@ -6,9 +6,10 @@ import AnimatedDie from '../AnimatedDie';
 interface HospitalModalProps {
     tile: Tile;
     onResolve: (result: { cost: number, health: number, happy: number }) => void;
+    canInteract?: boolean;
 }
 
-const HospitalModal: React.FC<HospitalModalProps> = ({ tile, onResolve }) => {
+const HospitalModal: React.FC<HospitalModalProps> = ({ tile, onResolve, canInteract = true }) => {
     const [dieValue, setDieValue] = useState<number | string>("🎲");
     const [isRolled, setIsRolled] = useState(false);
     const [isRolling, setIsRolling] = useState(false);
@@ -25,7 +26,7 @@ const HospitalModal: React.FC<HospitalModalProps> = ({ tile, onResolve }) => {
         : "Tira el dado. Por cada punto, pagas $1,000 pero recuperas 1 de Salud.";
 
     const rollDie = () => {
-        if (isRolling) return;
+        if (isRolling || !canInteract) return;
         playSound('diceRoll', 0.7);
         setIsRolling(true);
 
@@ -46,7 +47,7 @@ const HospitalModal: React.FC<HospitalModalProps> = ({ tile, onResolve }) => {
     };
 
     const handleResolve = () => {
-        if (!result) return;
+        if (!result || !canInteract) return;
         playSound('uiClick', 0.3);
         onResolve(result);
     };
@@ -86,14 +87,14 @@ const HospitalModal: React.FC<HospitalModalProps> = ({ tile, onResolve }) => {
                     </div>
 
                     {!isRolled ? (
-                        <button onClick={rollDie} disabled={isRolling}
-                            className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:scale-105 transition-transform active:scale-95 border-b-4 border-slate-300 disabled:opacity-50">
-                            {isRolling ? 'Lanzando...' : '🎲 Lanzar Dado'}
+                        <button onClick={rollDie} disabled={isRolling || !canInteract}
+                            className={`w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:scale-105 transition-transform active:scale-95 border-b-4 border-slate-300 disabled:opacity-50 ${!canInteract ? 'cursor-not-allowed is-wait' : ''}`}>
+                            {isRolling ? 'Lanzando...' : (canInteract ? '🎲 Lanzar Dado' : 'Esperando...')}
                         </button>
                     ) : (
-                        <button onClick={handleResolve}
-                            className="w-full py-4 bg-yellow-400 text-yellow-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_rgba(250,204,21,0.3)] hover:scale-105 transition-transform active:scale-95 border-b-4 border-yellow-600 animate__animated animate__pulse animate__infinite">
-                            ACEPTAR
+                        <button onClick={handleResolve} disabled={!canInteract}
+                            className={`w-full py-4 bg-yellow-400 text-yellow-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_rgba(250,204,21,0.3)] hover:scale-105 transition-transform active:scale-95 border-b-4 border-yellow-600 animate__animated animate__pulse animate__infinite ${!canInteract ? 'opacity-50 cursor-not-allowed animate-none' : ''}`}>
+                            {canInteract ? 'ACEPTAR' : 'Esperando...'}
                         </button>
                     )}
                 </div>

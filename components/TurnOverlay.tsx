@@ -8,9 +8,10 @@ interface TurnOverlayProps {
     player: Player;
     onStartTurn: () => void;
     dispatch: Dispatch<Action>;
+    canInteract?: boolean;
 }
 
-const TurnOverlay: React.FC<TurnOverlayProps> = ({ player, onStartTurn, dispatch }) => {
+const TurnOverlay: React.FC<TurnOverlayProps> = ({ player, onStartTurn, dispatch, canInteract = true }) => {
     const [quote, setQuote] = useState<{ text: string; author: string; book: string; } | null>(null);
     const [showQuote, setShowQuote] = useState(false);
     const [showAttribution, setShowAttribution] = useState(false);
@@ -53,6 +54,7 @@ const TurnOverlay: React.FC<TurnOverlayProps> = ({ player, onStartTurn, dispatch
     }, [showQuote]);
 
     const handleStart = () => {
+        if (!canInteract) return;
         playSound('uiClick', 0.4);
         onStartTurn();
     }
@@ -97,7 +99,13 @@ const TurnOverlay: React.FC<TurnOverlayProps> = ({ player, onStartTurn, dispatch
                     <div className="my-8 min-h-[8rem]"></div>
                 )}
 
-                <button onClick={handleStart} className="bg-white text-slate-900 px-12 py-4 rounded-full font-black text-lg uppercase shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-110 transition animate-pulse">¡JUGAR!</button>
+                {canInteract ? (
+                    <button onClick={handleStart} className="bg-white text-slate-900 px-12 py-4 rounded-full font-black text-lg uppercase shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-110 transition animate-pulse">¡JUGAR!</button>
+                ) : (
+                    <div className="bg-slate-800/80 text-white/50 px-12 py-4 rounded-full font-bold text-sm uppercase shadow-inner border border-white/10 flex items-center gap-3">
+                        <span className="animate-spin">⏳</span> Esperando a {player.name}...
+                    </div>
+                )}
             </div>
             <button
                 onClick={handleEndGame}

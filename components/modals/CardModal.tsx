@@ -6,15 +6,17 @@ interface CardModalProps {
     card: Card;
     category: string;
     onResolve: (success: boolean) => void;
+    canInteract?: boolean;
 }
 
-const CardModal: React.FC<CardModalProps> = ({ card, category, onResolve }) => {
+const CardModal: React.FC<CardModalProps> = ({ card, category, onResolve, canInteract = true }) => {
     // Reto specifically requires peer judgment (Logrado/Fallado)
     const isReto = category.includes("RETO") || !!card.requiresJudgment;
     // Show 2 buttons ONLY for Reto or tagged cards
     const showJudgmentButtons = isReto;
 
     const handleResolve = (success: boolean) => {
+        if (!canInteract) return;
         playSound('uiClick', 0.3);
         onResolve(success);
     };
@@ -119,20 +121,20 @@ const CardModal: React.FC<CardModalProps> = ({ card, category, onResolve }) => {
                                     Los otros jugadores dicen: ¿Logrado o Fallado?
                                 </p>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => handleResolve(true)}
-                                        className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase shadow-[0_4px_0_rgb(6,95,70)] text-sm hover:scale-105 transition-transform active:scale-95 active:shadow-none active:translate-y-1">
+                                    <button onClick={() => handleResolve(true)} disabled={!canInteract}
+                                        className={`py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase shadow-[0_4px_0_rgb(6,95,70)] text-sm hover:scale-105 transition-transform active:scale-95 active:shadow-none active:translate-y-1 ${!canInteract ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                         ✅ Logrado
                                     </button>
-                                    <button onClick={() => handleResolve(false)}
-                                        className="py-4 bg-red-500 text-white rounded-2xl font-black uppercase shadow-[0_4px_0_rgb(153,27,27)] text-sm hover:scale-105 transition-transform active:scale-95 active:shadow-none active:translate-y-1">
+                                    <button onClick={() => handleResolve(false)} disabled={!canInteract}
+                                        className={`py-4 bg-red-500 text-white rounded-2xl font-black uppercase shadow-[0_4px_0_rgb(153,27,27)] text-sm hover:scale-105 transition-transform active:scale-95 active:shadow-none active:translate-y-1 ${!canInteract ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                         ❌ Fallado
                                     </button>
                                 </div>
                             </>
                         ) : (
-                            <button onClick={() => handleResolve(true)}
-                                className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest shadow-[0_6px_0_rgb(203,213,225)] hover:scale-[1.02] transition-transform active:scale-95 active:shadow-none active:translate-y-1">
-                                {category.includes("EXPERTIS") ? "¡Genial!" : "Aceptar"}
+                            <button onClick={() => handleResolve(true)} disabled={!canInteract}
+                                className={`w-full py-4 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest shadow-[0_6px_0_rgb(203,213,225)] hover:scale-[1.02] transition-transform active:scale-95 active:shadow-none active:translate-y-1 ${!canInteract ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {canInteract ? (category.includes("EXPERTIS") ? "¡Genial!" : "Aceptar") : 'Esperando...'}
                             </button>
                         )}
                     </div>

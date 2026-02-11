@@ -4,9 +4,10 @@ import { Tile } from '../../types';
 interface InfoTileModalProps {
     tile: Tile;
     onClose: () => void;
+    canInteract?: boolean;
 }
 
-const InfoTileModal: React.FC<InfoTileModalProps> = ({ tile, onClose }) => {
+const InfoTileModal: React.FC<InfoTileModalProps> = ({ tile, onClose, canInteract = true }) => {
     if (!tile) return null;
 
     return (
@@ -31,9 +32,9 @@ const InfoTileModal: React.FC<InfoTileModalProps> = ({ tile, onClose }) => {
                         </p>
                     </div>
 
-                    <button onClick={onClose}
-                        className="w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-gray-100 hover:scale-[1.02] transition-transform active:scale-95 border-b-4 border-gray-300">
-                        Entendido
+                    <button onClick={onClose} disabled={!canInteract}
+                        className={`w-full py-4 bg-white text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-gray-100 hover:scale-[1.02] transition-transform active:scale-95 border-b-4 border-gray-300 ${!canInteract ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        {canInteract ? 'Entendido' : 'Esperando...'}
                     </button>
                 </div>
             </div>

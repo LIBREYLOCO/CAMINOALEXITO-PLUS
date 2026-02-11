@@ -7,9 +7,10 @@ interface RouteModalProps {
     tile: Tile;
     player: Player;
     onDecision: (enter: boolean) => void;
+    canInteract?: boolean;
 }
 
-const RouteModal: React.FC<RouteModalProps> = ({ tile, player, onDecision }) => {
+const RouteModal: React.FC<RouteModalProps> = ({ tile, player, onDecision, canInteract = true }) => {
     const routeId = tile.r;
     if (!routeId) return null;
 
@@ -17,6 +18,7 @@ const RouteModal: React.FC<RouteModalProps> = ({ tile, player, onDecision }) => 
     const cost = alreadyVisited ? 0 : (routeCosts[routeId] || 3000);
 
     const handleDecision = (enter: boolean) => {
+        if (!canInteract) return;
         playSound('uiClick', 0.3);
         onDecision(enter);
     }
@@ -46,12 +48,14 @@ const RouteModal: React.FC<RouteModalProps> = ({ tile, player, onDecision }) => 
                 <div className="space-y-3">
                     <button
                         onClick={() => handleDecision(true)}
-                        disabled={!canAfford}
-                        className={`w-full py-4 rounded-xl font-black text-sm uppercase shadow-lg transition-all ${canAfford ? 'btn-gold' : 'bg-gray-600 text-gray-400 cursor-not-allowed grayscale'}`}
+                        disabled={!canAfford || !canInteract}
+                        className={`w-full py-4 rounded-xl font-black text-sm uppercase shadow-lg transition-all ${canAfford && canInteract ? 'btn-gold' : 'bg-gray-600 text-gray-400 cursor-not-allowed grayscale'}`}
                     >
-                        {canAfford ? '✅ Entrar' : '🔒 No te alcanza'}
+                        {canInteract ? (canAfford ? '✅ Entrar' : '🔒 No te alcanza') : 'Esperando...'}
                     </button>
-                    <button onClick={() => handleDecision(false)} className="w-full py-4 bg-white/10 rounded-xl text-white font-bold text-xs uppercase hover:bg-white/20">🚫 Seguir por fuera</button>
+                    <button onClick={() => handleDecision(false)} disabled={!canInteract} className={`w-full py-4 bg-white/10 rounded-xl text-white font-bold text-xs uppercase hover:bg-white/20 ${!canInteract ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        🚫 Seguir por fuera
+                    </button>
                 </div>
             </div>
         </div>

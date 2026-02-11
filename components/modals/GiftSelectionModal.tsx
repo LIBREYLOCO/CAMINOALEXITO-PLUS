@@ -6,9 +6,10 @@ interface GiftSelectionModalProps {
     giver: Player;
     receiver: Player;
     onGiftSelect: (gift: Rewards) => void;
+    canInteract?: boolean;
 }
 
-const GiftSelectionModal: React.FC<GiftSelectionModalProps> = ({ giver, receiver, onGiftSelect }) => {
+const GiftSelectionModal: React.FC<GiftSelectionModalProps> = ({ giver, receiver, onGiftSelect, canInteract = true }) => {
     const [moneyGift, setMoneyGift] = useState(0);
     const [healthGift, setHealthGift] = useState(0);
     const [happyGift, setHappyGift] = useState(0);
@@ -16,6 +17,7 @@ const GiftSelectionModal: React.FC<GiftSelectionModalProps> = ({ giver, receiver
     const totalGifted = moneyGift + healthGift + happyGift;
 
     const handleConfirm = () => {
+        if (!canInteract) return;
         if (totalGifted > 0) {
             onGiftSelect({
                 money: moneyGift,
@@ -52,15 +54,17 @@ const GiftSelectionModal: React.FC<GiftSelectionModalProps> = ({ giver, receiver
                 <span className="text-3xl">{icon}</span>
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => setValue(Math.max(0, value - step))}
-                        className="w-10 h-10 rounded-full glass flex items-center justify-center text-2xl font-black hover:bg-white/10 active:scale-90 transition-all"
+                        onClick={() => canInteract && setValue(Math.max(0, value - step))}
+                        disabled={!canInteract}
+                        className={`w-10 h-10 rounded-full glass flex items-center justify-center text-2xl font-black transition-all ${canInteract ? 'hover:bg-white/10 active:scale-90' : 'opacity-50 cursor-not-allowed'}`}
                     >-</button>
                     <span className="text-xl font-black text-white min-w-[3rem] text-center">
                         {label === 'Dinero' ? `$${value.toLocaleString()}` : value}
                     </span>
                     <button
-                        onClick={() => setValue(Math.min(max, value + step))}
-                        className="w-10 h-10 rounded-full glass flex items-center justify-center text-2xl font-black hover:bg-white/10 active:scale-90 transition-all"
+                        onClick={() => canInteract && setValue(Math.min(max, value + step))}
+                        disabled={!canInteract}
+                        className={`w-10 h-10 rounded-full glass flex items-center justify-center text-2xl font-black transition-all ${canInteract ? 'hover:bg-white/10 active:scale-90' : 'opacity-50 cursor-not-allowed'}`}
                     >+</button>
                 </div>
             </div>
@@ -116,15 +120,15 @@ const GiftSelectionModal: React.FC<GiftSelectionModalProps> = ({ giver, receiver
 
                     <button
                         onClick={handleConfirm}
-                        disabled={totalGifted <= 0}
+                        disabled={totalGifted <= 0 || !canInteract}
                         className={`
                             w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all
-                            ${totalGifted > 0
+                            ${totalGifted > 0 && canInteract
                                 ? 'bg-fuchsia-600 shadow-[0_4px_20px_rgba(192,38,211,0.4)] text-white hover:scale-105 active:scale-95'
                                 : 'bg-white/5 text-white/20 cursor-not-allowed'}
                         `}
                     >
-                        {totalGifted > 0 ? 'Confirmar Regalos' : 'Debes regalar algo'}
+                        {canInteract ? (totalGifted > 0 ? 'Confirmar Regalos' : 'Debes regalar algo') : 'Esperando...'}
                     </button>
                 </div>
             </div>
