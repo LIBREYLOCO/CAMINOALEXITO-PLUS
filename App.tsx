@@ -267,7 +267,7 @@ const App: React.FC = () => {
                     />
                 )
             )}
-            {(gameStatus === GameStatus.Playing || gameStatus === GameStatus.Celebrating) && <GameScreen state={state} dispatch={dispatch} />}
+            {(gameStatus === GameStatus.Playing || gameStatus === GameStatus.Celebrating) && <GameScreen state={state} dispatch={dispatch} localPlayerIndex={localPlayerIndex} />}
             {gameStatus === GameStatus.Win && winner && <WinScreen winner={winner} allPlayers={players} dispatch={dispatch} />}
 
             {showTurnOverlay && players[currentPlayerIndex] && (

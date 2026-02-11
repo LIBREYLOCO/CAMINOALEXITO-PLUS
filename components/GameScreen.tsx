@@ -14,9 +14,10 @@ import { playSound } from '../utils/soundManager';
 interface GameScreenProps {
     state: GameState;
     dispatch: Dispatch<Action>;
+    localPlayerIndex?: number | null;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ state, dispatch }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ state, dispatch, localPlayerIndex }) => {
     const { players, currentPlayerIndex, pozo, dice, isRolling, passiveIncomeBanner, isMoving, moveDetails, isMovingInRoute, routeMoveDetails } = state;
     const currentPlayer = players[currentPlayerIndex];
     const isAnimating = useRef(false);
@@ -102,6 +103,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ state, dispatch }) => {
         }
     }, [state.gameStatus, dispatch]);
 
+    const isMyTurn = !state.roomId || (localPlayerIndex !== null && localPlayerIndex !== undefined && localPlayerIndex === currentPlayerIndex);
+
     return (
         <div id="screen-game" className="bg-slate-900 absolute inset-0">
             {passiveIncomeBanner?.visible && (
@@ -125,6 +128,12 @@ const GameScreen: React.FC<GameScreenProps> = ({ state, dispatch }) => {
                             </div>
                         )}
 
+                        {!isMyTurn && state.roomId && (
+                            <div className="absolute top-4 bg-slate-800/90 text-white text-[10px] font-black px-4 py-2 rounded-full uppercase z-20 shadow-xl border border-white/20 animate-pulse">
+                                👁️ Espectador: Turno de {currentPlayer.name}
+                            </div>
+                        )}
+
                         <BoardWrapper>
                             <div className="relative w-[95vmin] h-[95vmin] max-w-[680px] max-h-[680px]">
                                 <GameBoard
@@ -141,7 +150,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ state, dispatch }) => {
                     <Controls
                         dice={dice}
                         isRolling={isRolling}
-                        disabled={isRolling || isMoving || isMovingInRoute}
+                        disabled={!isMyTurn || isRolling || isMoving || isMovingInRoute}
                         inRoute={currentPlayer.inRoute}
                         onRoll={() => dispatch({ type: 'ROLL_DICE' })}
                     />
