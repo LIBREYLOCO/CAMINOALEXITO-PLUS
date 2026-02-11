@@ -19,7 +19,13 @@ const WinScreen: React.FC<WinScreenProps> = ({ winner, allPlayers, dispatch }) =
     const [mentorFeedback, setMentorFeedback] = useState<string | null>(null);
     const [isLoadingFeedback, setIsLoadingFeedback] = useState(false);
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
     useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollTop = 0;
+        }
+        // Also try window scroll just in case
         window.scrollTo(0, 0);
     }, []);
 
@@ -59,7 +65,7 @@ const WinScreen: React.FC<WinScreenProps> = ({ winner, allPlayers, dispatch }) =
     };
 
     return (
-        <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-center p-6 overflow-y-auto custom-scroll modal-active">
+        <div ref={containerRef} className="fixed inset-0 bg-black flex flex-col items-center justify-start text-center p-6 overflow-y-auto custom-scroll modal-active">
             <div className="absolute inset-0 opacity-50 pointer-events-none">
                 <Firework left="20%" top="30%" />
                 <Firework left="80%" top="20%" delay="0.5s" />
