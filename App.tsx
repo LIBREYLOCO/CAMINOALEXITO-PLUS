@@ -57,10 +57,14 @@ const App: React.FC = () => {
 
     // AUTO-SYNC: Si somos el host, enviamos los cambios locales al servidor
     // EXCEPTION: During SETUP, allow clients to sync their player creation data
+    // ALSO: Allow syncing ONE TIME when transitioning from Setup to Playing (to start game for everyone)
     useEffect(() => {
         if (roomId) {
             const isSetup = state.gameStatus === GameStatus.Setup;
-            if (isHost || isSetup) {
+            // Check if we just transitioned to playing (this allows the last player to push the state)
+            const justStarted = state.gameStatus === GameStatus.Playing && prevGameStatus === GameStatus.Setup;
+
+            if (isHost || isSetup || justStarted) {
                 const currentStateStr = JSON.stringify(state);
                 // Only sync if the current state is different from the last state we received from remote
                 if (currentStateStr !== lastRemoteState.current) {
@@ -68,7 +72,7 @@ const App: React.FC = () => {
                 }
             }
         }
-    }, [state, roomId, isHost]);
+    }, [state, roomId, isHost, prevGameStatus]);
 
     // Sound effects for high-level state changes
     useEffect(() => {
@@ -259,6 +263,7 @@ const App: React.FC = () => {
                     <WaitingSetupScreen
                         currentSetupIndex={setupPlayerIndex}
                         totalPlayers={totalPlayers}
+                        roomId={roomId}
                     />
                 )
             )}

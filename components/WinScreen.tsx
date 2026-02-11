@@ -1,4 +1,4 @@
-import React, { Dispatch, useState } from 'react';
+import React, { Dispatch, useState, useEffect } from 'react';
 import { Player } from '../types';
 import { Action } from '../state/gameReducer';
 import PlayerStatusCard from './PlayerStatusCard';
@@ -18,6 +18,10 @@ const Firework: React.FC<{ left: string; top: string; delay?: string }> = ({ lef
 const WinScreen: React.FC<WinScreenProps> = ({ winner, allPlayers, dispatch }) => {
     const [mentorFeedback, setMentorFeedback] = useState<string | null>(null);
     const [isLoadingFeedback, setIsLoadingFeedback] = useState(false);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const calculateSuccess = (p: Player): number => {
         const m = Math.min(Math.floor(p.actual.money / 1000), p.metas.d);
