@@ -7,6 +7,7 @@ import WinScreen from './components/WinScreen';
 import IntroScreen from './components/IntroScreen';
 import LobbyScreen from './components/LobbyScreen';
 import TurnOverlay from './components/TurnOverlay';
+import WaitingSetupScreen from './components/WaitingSetupScreen';
 import InfoTileModal from './components/modals/InfoTileModal';
 import RouteModal from './components/modals/RouteModal';
 import CardModal from './components/modals/CardModal';
@@ -138,7 +139,10 @@ const App: React.FC = () => {
         dispatch({ type: 'SHOW_LOBBY' });
     };
 
+    const [localPlayerIndex, setLocalPlayerIndex] = useState<number | null>(null);
+
     const handleCreateRoom = (id: string, initialGameSettings?: any) => {
+        setLocalPlayerIndex(0); // Host is always Player 1 (Index 0)
         dispatch({
             type: 'SET_ROOM_ID',
             payload: {
@@ -156,11 +160,18 @@ const App: React.FC = () => {
     }
 
     const handleJoinRoom = (id: string, remoteState: any) => {
+        // Assume Joiner is Player 2 (Index 1) for now.
+        // In a robust system, we'd get this from Firebase "connected_players" list.
+        setLocalPlayerIndex(1);
         dispatch({ type: 'SET_ROOM_ID', payload: { roomId: id, isHost: false } });
         dispatch({ type: 'SYNC_ONLINE_STATE', payload: remoteState });
     }
 
     const handleStartSetup = (playerCount: number) => {
+        // Local game setup
+        setLocalPlayerIndex(null); // Reset for local game, or handle differently?
+        // Actually, for local game, we want SetupScreen to ALWAYS show because same device is used for everyone.
+        // So localPlayerIndex should be null or ignored in local mode.
         dispatch({ type: 'START_SETUP', payload: playerCount });
     };
 
@@ -205,6 +216,13 @@ const App: React.FC = () => {
         }
     };
 
+    // Determine if we should show Setup or Waiting
+    const showSetup = gameStatus === GameStatus.Setup;
+    // For local game (roomId == null), we always show setup.
+    // For online game, we only show setup if setupPlayerIndex matches localPlayerIndex.
+    const isMyTurnToSetup = !roomId || (localPlayerIndex !== null && setupPlayerIndex === localPlayerIndex);
+
+
     return (
         <>
             {gameStatus !== GameStatus.Intro && gameStatus !== GameStatus.Start && gameStatus !== GameStatus.Setup && gameStatus !== GameStatus.Lobby && <SoundToggle />}
@@ -226,16 +244,23 @@ const App: React.FC = () => {
                     onBack={() => dispatch({ type: 'SHOW_START_SCREEN' })}
                 />
             )}
-            {gameStatus === GameStatus.Setup && (
-                <SetupScreen
-                    playerIndex={setupPlayerIndex}
-                    totalPlayers={totalPlayers}
-                    onSave={handleSavePlayer}
-                    existingNames={players.map(p => p.name)}
-                    usedColors={players.map(p => p.color)}
-                    usedIcons={players.map(p => p.icon)}
-                    roomCode={roomId}
-                />
+            {showSetup && (
+                isMyTurnToSetup ? (
+                    <SetupScreen
+                        playerIndex={setupPlayerIndex}
+                        totalPlayers={totalPlayers}
+                        onSave={handleSavePlayer}
+                        existingNames={players.map(p => p.name)}
+                        usedColors={players.map(p => p.color)}
+                        usedIcons={players.map(p => p.icon)}
+                        roomCode={roomId}
+                    />
+                ) : (
+                    <WaitingSetupScreen
+                        currentSetupIndex={setupPlayerIndex}
+                        totalPlayers={totalPlayers}
+                    />
+                )
             )}
             {(gameStatus === GameStatus.Playing || gameStatus === GameStatus.Celebrating) && <GameScreen state={state} dispatch={dispatch} />}
             {gameStatus === GameStatus.Win && winner && <WinScreen winner={winner} allPlayers={players} dispatch={dispatch} />}
