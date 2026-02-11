@@ -9,14 +9,15 @@ interface WaitingSetupScreenProps {
 const WaitingSetupScreen: React.FC<WaitingSetupScreenProps> = ({ currentSetupIndex, totalPlayers, roomId }) => {
     return (
         <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-6">
-            {roomId && (
-                <div className="fixed top-6 right-6 z-[100]">
-                    <div className="bg-cyan-500/20 border border-cyan-500 text-cyan-400 font-black py-2 px-6 rounded-xl text-xl uppercase tracking-widest shadow-[0_0_15px_rgba(6,182,212,0.3)] animate-pulse">
-                        SALA: {roomId}
-                    </div>
-                </div>
-            )}
             <div className="w-full max-w-md text-center space-y-8">
+                {roomId && (
+                    <div className="mb-8 animate__animated animate__fadeInDown">
+                        <p className="text-cyan-400 text-sm font-bold uppercase tracking-widest mb-2">Código de Sala</p>
+                        <div className="bg-cyan-500/10 border-2 border-cyan-500 text-cyan-400 font-black py-4 px-8 rounded-2xl text-5xl uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(6,182,212,0.4)] animate-pulse inline-block">
+                            {roomId}
+                        </div>
+                    </div>
+                )}
                 <div className="relative">
                     <div className="absolute inset-0 bg-yellow-500/20 blur-3xl rounded-full animate-pulse"></div>
                     <div className="relative text-8xl mb-4 animate-bounce">⏳</div>
